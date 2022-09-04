@@ -1,5 +1,47 @@
-from flask import Flask
+from flask import Flask, make_response, jsonify
+import json
 
 app = Flask(__name__)
+
+ds = open('PokeData-Backend/pokemon.json')
+dsjson = json.load(ds)
+
+
+@app.route('/pokeinfo/<string:index>', methods=['GET'])
+def aldataofpokemon(index):
+    dados = [
+        {
+            "name": dsjson['name'][index],
+            "typing": dsjson['typing'][index],
+            "primary_color": dsjson['primary_color'][index],
+            "height": dsjson['height'][index],
+            "weight": dsjson['weight'][index],
+            "gen_introduced": dsjson['gen_introduced'][index],
+            "hp": dsjson['hp'][index],
+            "attack": dsjson['attack'][index],
+            "defense": dsjson['defense'][index],
+            "speed": dsjson['speed'][index],
+            "special_attack": dsjson['special_attack'][index],
+            "special_defense": dsjson['special_defense'][index],
+            "abilities": dsjson['abilities'][index]
+        }
+    ]
+
+    return make_response(
+        jsonify(dados)
+    )
+# print(dsjson['typing']['0'])   
+
+# @app.route('/vantagem/<string:tipo>', methods=['GET'])
+# def alladvantageofpokemon(tipo):
+
+#     dados = [
+#         {
+#             "type_1": '',
+#             "type_2": ''
+#         }
+#     ]
+#     return()
+
 
 app.run()
