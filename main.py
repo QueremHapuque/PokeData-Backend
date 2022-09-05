@@ -1,6 +1,7 @@
 from flask import Flask, make_response, jsonify
 import json
 import pandas as pd
+from pokeColuna import pokeId
 
 app = Flask(__name__)
 app.config['JSON_SORT_KEYS'] = False
@@ -12,14 +13,13 @@ print(dsP)
 ds = open('pokemon.json')
 dsjson = json.load(ds)
 
-ds_teste = pd.read_parquet('./pokemon.parquet')
-
 
 @app.route('/pokeinfo/<string:index>', methods=['GET'])
 def aldataofpokemon(index):
     
-    pokemon = ds_teste.loc[ds_teste['pokedex_number'] == int(index)].to_dict()
-    dados = [
+    pokemon = dsP.loc[dsP['pokedex_number'] == int(index)].to_dict()
+    
+    pokemon_data = [
         {
             "name": pokemon['name'],
             "typing":pokemon['typing'],
@@ -39,7 +39,7 @@ def aldataofpokemon(index):
     ]
 
     return make_response(
-        jsonify(dados)    
+        jsonify(pokemon_data)    
     )
 
 
