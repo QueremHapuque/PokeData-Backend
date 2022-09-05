@@ -1,5 +1,6 @@
 from flask import Flask, make_response, jsonify
 import json
+import pandas as pd
 
 app = Flask(__name__)
 app.config['JSON_SORT_KEYS'] = False
@@ -7,23 +8,29 @@ app.config['JSON_SORT_KEYS'] = False
 ds = open('pokemon.json')
 dsjson = json.load(ds)
 
+ds_teste = pd.read_parquet('./pokemon.parquet')
+
+
 @app.route('/pokeinfo/<string:index>', methods=['GET'])
 def aldataofpokemon(index):
+    
+    pokemon = ds_teste.loc[ds_teste['pokedex_number'] == int(index)].to_dict()
     dados = [
         {
-            "name": dsjson['name'][index],
-            "typing": dsjson['typing'][index],
-            "primary_color": dsjson['primary_color'][index],
-            "height": dsjson['height'][index],
-            "weight": dsjson['weight'][index],
-            "gen_introduced": dsjson['gen_introduced'][index],
-            "hp": dsjson['hp'][index],
-            "attack": dsjson['attack'][index],
-            "defense": dsjson['defense'][index],
-            "speed": dsjson['speed'][index],
-            "special_attack": dsjson['special_attack'][index],
-            "special_defense": dsjson['special_defense'][index],
-            "abilities": dsjson['abilities'][index]
+            "name": pokemon['name'],
+            "typing":pokemon['typing'],
+            "primary_color": pokemon['primary_color'],
+            "height": pokemon['height'],
+            "weight": pokemon['weight'],
+            "gen_introduced": pokemon['gen_introduced'],
+            "hp": pokemon['hp'],
+            "attack":pokemon['attack'],
+            "defense": pokemon['defense'],
+            "speed": pokemon['speed'],
+            "special_attack": pokemon['special_attack'],
+            "special_defense": pokemon['special_defense'],
+            "abilities": pokemon['abilities'],
+            "id": pokemon['id']
         }
     ]
 
