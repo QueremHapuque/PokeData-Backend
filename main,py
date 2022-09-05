@@ -5,6 +5,10 @@ import pandas as pd
 app = Flask(__name__)
 app.config['JSON_SORT_KEYS'] = False
 
+dsP = pd.read_parquet('pokemon.parquet')
+dsP = pokeId(dsP)
+print(dsP)
+
 ds = open('pokemon.json')
 dsjson = json.load(ds)
 
