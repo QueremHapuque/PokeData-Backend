@@ -2,10 +2,10 @@ from flask import Flask, make_response, jsonify
 import json
 
 app = Flask(__name__)
+app.config['JSON_SORT_KEYS'] = False
 
-ds = open('PokeData-Backend/pokemon.json')
+ds = open('pokemon.json')
 dsjson = json.load(ds)
-
 
 @app.route('/pokeinfo/<string:index>', methods=['GET'])
 def aldataofpokemon(index):
@@ -28,20 +28,42 @@ def aldataofpokemon(index):
     ]
 
     return make_response(
-        jsonify(dados)
+        jsonify(dados)    
     )
-# print(dsjson['typing']['0'])   
 
-# @app.route('/vantagem/<string:tipo>', methods=['GET'])
-# def alladvantageofpokemon(tipo):
 
-#     dados = [
-#         {
-#             "type_1": '',
-#             "type_2": ''
-#         }
-#     ]
-#     return()
+@app.route('/vantagem/<string:tipo>', methods=['GET'])
+def alladvantageofpokemon(tipo):
 
+    listaMultplicador = []
+    listaIndex = []
+    contador = 0
+    ataq = 'fire_attack_effectiveness'
+    maior = 0
+    tipo1 = ''
+    tipo2 = ''
+    rep = ataq.replace('fire', tipo)
+    for mult in dsjson[rep]:
+        if int(dsjson[rep][mult]) >= maior:
+            maior = int(dsjson[rep][mult])
+            listaMultplicador.append(maior)
+            listaIndex.append(mult)
+
+    for i in range(len(listaIndex)):
+        contador -= 1
+        if tipo1 == '':
+            tipo1 = dsjson['typing'][listaIndex[contador]]
+        if tipo1 != dsjson['typing'][listaIndex[contador]]:
+            tipo2 = dsjson['typing'][listaIndex[contador]]
+            break
+    vantagens = [
+        {
+            "type_1": tipo1,
+            "type_2": tipo2
+        }
+    ]
+    return make_response(
+        jsonify(vantagens)
+    )
 
 app.run()
