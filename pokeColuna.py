@@ -9,7 +9,7 @@ def pokeId(ds):
                     listaId.append(str(i))
                 else:
                     proxIndex = 0
-                    proxIndex = int(listaId[cont - 1][-1]) + 1
+                    proxIndex = int(listaId[cont - 1][listaId[cont-1].index('-') + 1:]) + 1
                     r = str(i).replace(str(i), '{}-{}'.format(i, proxIndex))
                     listaId.append(r)
             else:
