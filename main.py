@@ -9,7 +9,11 @@ app.config['JSON_SORT_KEYS'] = False
 
 dsP = pd.read_parquet('pokemon.parquet')
 dsP = pokeId(dsP)
+<<<<<<< HEAD
 #print(dsP)
+=======
+# print(dsP)
+>>>>>>> f14cc04cc5342abad8f75b8f52e2023988536c51
 
 ds = open('pokemon.json')
 dsjson = json.load(ds)
@@ -77,5 +81,25 @@ def alladvantageofpokemon(tipo):
     return make_response(
         jsonify(vantagens)
     )
+
+@app.route('/status/<string:id>', methods=['GET'])
+def allstatusofpokemon(id):
+    pokemon = dsP.loc[dsP['id'] == str(id)].to_dict()
+    
+    pokemon_status = [
+        {
+            "hp": pokemon['hp'],
+            "attack":pokemon['attack'],
+            "defense": pokemon['defense'],
+            "speed": pokemon['speed'],
+            "special_attack": pokemon['special_attack'],
+            "special_defense": pokemon['special_defense'],
+        }
+    ]
+
+    return make_response(
+        jsonify(pokemon_status)    
+    )
+
 
 app.run()
