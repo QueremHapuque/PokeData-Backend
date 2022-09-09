@@ -1,3 +1,4 @@
+from operator import index
 from flask import Flask, make_response, jsonify
 import json
 import pandas as pd
@@ -8,7 +9,7 @@ app.config['JSON_SORT_KEYS'] = False
 
 dsP = pd.read_parquet('pokemon.parquet')
 dsP = pokeId(dsP)
-print(dsP)
+#print(dsP)
 
 ds = open('pokemon.json')
 dsjson = json.load(ds)
