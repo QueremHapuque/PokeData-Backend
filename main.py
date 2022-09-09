@@ -9,11 +9,6 @@ app.config['JSON_SORT_KEYS'] = False
 
 dsP = pd.read_parquet('pokemon.parquet')
 dsP = pokeId(dsP)
-<<<<<<< HEAD
-#print(dsP)
-=======
-# print(dsP)
->>>>>>> f14cc04cc5342abad8f75b8f52e2023988536c51
 
 ds = open('pokemon.json')
 dsjson = json.load(ds)
@@ -101,5 +96,24 @@ def allstatusofpokemon(id):
         jsonify(pokemon_status)    
     )
 
+@app.route('/allpokemons', methods=['GET'])
+def allpokemons():
+    pokemon = dsP
+
+    allpikomons = []
+
+
+    for i in range(len(pokemon)):
+        allpikomons.append({
+            "name": str(pokemon.loc[i,'name']),
+            "id": str(pokemon.loc[i,'id']),
+            "typing": str(pokemon.loc[i,'typing']),
+            "pokedex_number": str(pokemon.loc[i,'pokedex_number']),
+            "img": str(pokemon.loc[i,'id'])
+        })
+
+    return make_response(
+        jsonify(allpikomons)
+    )
 
 app.run()
