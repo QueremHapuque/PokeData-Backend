@@ -1,3 +1,4 @@
+from operator import index
 from flask import Flask, make_response, jsonify
 import json
 import pandas as pd
@@ -8,7 +9,6 @@ app.config['JSON_SORT_KEYS'] = False
 
 dsP = pd.read_parquet('pokemon.parquet')
 dsP = pokeId(dsP)
-print(dsP)
 
 ds = open('pokemon.json')
 dsjson = json.load(ds)
@@ -75,6 +75,45 @@ def alladvantageofpokemon(tipo):
     ]
     return make_response(
         jsonify(vantagens)
+    )
+
+@app.route('/status/<string:id>', methods=['GET'])
+def allstatusofpokemon(id):
+    pokemon = dsP.loc[dsP['id'] == str(id)].to_dict()
+    
+    pokemon_status = [
+        {
+            "hp": pokemon['hp'],
+            "attack":pokemon['attack'],
+            "defense": pokemon['defense'],
+            "speed": pokemon['speed'],
+            "special_attack": pokemon['special_attack'],
+            "special_defense": pokemon['special_defense'],
+        }
+    ]
+
+    return make_response(
+        jsonify(pokemon_status)    
+    )
+
+@app.route('/allpokemons', methods=['GET'])
+def allpokemons():
+    pokemon = dsP
+
+    allpikomons = []
+
+
+    for i in range(len(pokemon)):
+        allpikomons.append({
+            "name": str(pokemon.loc[i,'name']),
+            "id": str(pokemon.loc[i,'id']),
+            "typing": str(pokemon.loc[i,'typing']),
+            "pokedex_number": str(pokemon.loc[i,'pokedex_number']),
+            "img": str(pokemon.loc[i,'id'])
+        })
+
+    return make_response(
+        jsonify(allpikomons)
     )
 
 app.run()
