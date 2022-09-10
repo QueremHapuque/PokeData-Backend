@@ -14,8 +14,8 @@ ds = open('pokemon.json')
 dsjson = json.load(ds)
 
 
-@app.route('/pokeinfo/<string:index>', methods=['GET'])
-def aldataofpokemon(index):
+@app.route('/alldataofpokemon/<string:index>', methods=['GET'])
+def alldataofpokemon(index):
     
     pokemon = dsP.loc[dsP['pokedex_number'] == int(index)].to_dict()
     
@@ -43,7 +43,7 @@ def aldataofpokemon(index):
     )
 
 
-@app.route('/vantagem/<string:tipo>', methods=['GET'])
+@app.route('/alladvantageofpokemon/<string:tipo>', methods=['GET'])
 def alladvantageofpokemon(tipo):
 
     listaMultplicador = []
