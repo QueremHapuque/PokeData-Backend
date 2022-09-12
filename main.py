@@ -77,7 +77,7 @@ def alladvantageofpokemon(tipo):
         jsonify(vantagens)
     )
 
-@app.route('/status/<string:id>', methods=['GET'])
+@app.route('/allstatusofpokemon/<string:id>', methods=['GET'])
 def allstatusofpokemon(id):
     pokemon = dsP.loc[dsP['id'] == str(id)].to_dict()
     
