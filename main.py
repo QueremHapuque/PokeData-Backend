@@ -27,20 +27,20 @@ def aldataofpokemon(index):
     
     pokemon_data = [
         {
-            "name": str(*pokemon['name'].values()),
-            "typing":str(*pokemon['typing'].values()),
-            "primary_color": str(*pokemon['primary_color'].values()),
-            "height": str(*pokemon['height'].values()),
-            "weight": str(*pokemon['weight'].values()),
-            "gen_introduced": str(*pokemon['gen_introduced'].values()),
-            "hp": str(*pokemon['hp'].values()),
-            "attack":str(*pokemon['attack'].values()),
-            "defense": str(*pokemon['defense'].values()),
-            "speed": str(*pokemon['speed'].values()),
-            "special_attack": str(*pokemon['special_attack'].values()),
-            "special_defense": str(*pokemon['special_defense'].values()),
-            "abilities": str(*pokemon['abilities'].values()),
-            "id": str(*pokemon['id'].values())
+            "name": str(pokemon['name'].values()),
+            "typing":str(pokemon['typing'].values()),
+            "primary_color": str(pokemon['primary_color'].values()),
+            "height": str(pokemon['height'].values()),
+            "weight": str(pokemon['weight'].values()),
+            "gen_introduced": str(pokemon['gen_introduced'].values()),
+            "hp": str(pokemon['hp'].values()),
+            "attack":str(pokemon['attack'].values()),
+            "defense": str(pokemon['defense'].values()),
+            "speed": str(pokemon['speed'].values()),
+            "special_attack": str(pokemon['special_attack'].values()),
+            "special_defense": str(pokemon['special_defense'].values()),
+            "abilities": str(pokemon['abilities'].values()),
+            "id": str(pokemon['id'].values())
         }
     ]
 
@@ -48,6 +48,29 @@ def aldataofpokemon(index):
         jsonify(pokemon_data)
     )
 
+@app.route('/allweaknessofpokemon/<string:id>', methods=['GET'])
+def allweaknessofpokemon(id):
+    pokemon = dsP.loc[dsP['id'] == str(id)].to_dict()
+    vulnerabilities = list_Vulnerabilities(pokemon)
+    bigger = 0
+    type1 = ''
+    type2 = ''
+
+    for key, value in vulnerabilities.items():
+        if value > bigger:
+            type2 = type1
+            type1 = key
+
+    weakness = [
+        {
+            "type_1": type1,
+            "type_2": type2,
+        }
+    ]
+
+    return make_response(
+        jsonify(vulnerabilities)
+    )
 
 @app.route('/alladvantageofpokemon/<string:tipo>', methods=['GET'])
 def alladvantageofpokemon(tipo):
@@ -89,19 +112,18 @@ def allstatusofpokemon(id):
 
     pokemon_status = [
         {
-            "hp": str(*pokemon['hp'].values()),
-            "attack": str(*pokemon['attack'].values()),
-            "defense": str(*pokemon['defense'].values()),
-            "speed": str(*pokemon['speed'].values()),
-            "special_attack": str(*pokemon['special_attack'].values()),
-            "special_defense": str(*pokemon['special_defense'].values())
+            "hp": str(pokemon['hp'].values()),
+            "attack": str(pokemon['attack'].values()),
+            "defense": str(pokemon['defense'].values()),
+            "speed": str(pokemon['speed'].values()),
+            "special_attack": str(pokemon['special_attack'].values()),
+            "special_defense": str(pokemon['special_defense'].values())
         }
     ]
 
     return make_response(
         jsonify(pokemon_status)
     )
-
 
 @app.route('/allpokemons', methods=['GET'])
 def allpokemons():
