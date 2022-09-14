@@ -2,6 +2,7 @@ from operator import index
 from flask import Flask, make_response, jsonify
 import json
 import pandas as pd
+import cluster
 from pokeColuna import pokeId
 from vulnerabilities import list_Vulnerabilities
 
@@ -11,14 +12,18 @@ app.config['JSON_SORT_KEYS'] = False
 dsP = pd.read_parquet('pokemon.parquet')
 dsP = pokeId(dsP)
 
+cluster_column = cluster.create_cluster(dsP, 12)
+
+dsP['cluster_id'] = cluster_column
+
 ds = open('pokemon.json')
 dsjson = json.load(ds)
 
 
-@app.route('/alldataofpokemon/<string:id>', methods=['GET'])
-def alldataofpokemon(id):
+@app.route('/pokeinfo/<string:index>', methods=['GET'])
+def aldataofpokemon(index):
     
-    pokemon = dsP.loc[dsP['id'] == str(id)].to_dict()
+    pokemon = dsP.loc[dsP['pokedex_number'] == int(index)].to_dict()
     
     pokemon_data = [
         {
@@ -40,7 +45,7 @@ def alldataofpokemon(id):
     ]
 
     return make_response(
-        jsonify(pokemon_data)    
+        jsonify(pokemon_data)
     )
 
 
@@ -78,32 +83,7 @@ def alladvantageofpokemon(tipo):
         jsonify(vantagens)
     )
 
-@app.route('/allweaknessofpokemon/<string:id>', methods=['GET'])
-def allweaknessofpokemon(id):
-    pokemon = dsP.loc[dsP['id'] == str(id)].to_dict()
-    vulnerabilities = list_Vulnerabilities(pokemon)
-    bigger = 0
-    type1 = ''
-    type2 = ''
-
-    for key, value in vulnerabilities.items():
-        if value > bigger:
-            type2 = type1
-            type1 = key
-
-    weakness = [
-        {
-            "type_1": type1,
-            "type_2": type2,
-        }
-    ]
-
-    return make_response(
-        jsonify(vulnerabilities)
-    )
-
-
-@app.route('/allstatusofpokemon/<string:id>', methods=['GET'])
+@app.route('/status/<string:id>', methods=['GET'])
 def allstatusofpokemon(id):
     pokemon = dsP.loc[dsP['id'] == str(id)].to_dict()
 
@@ -119,8 +99,9 @@ def allstatusofpokemon(id):
     ]
 
     return make_response(
-        jsonify(pokemon_status)    
+        jsonify(pokemon_status)
     )
+
 
 @app.route('/allpokemons', methods=['GET'])
 def allpokemons():
@@ -128,18 +109,46 @@ def allpokemons():
 
     allpikomons = []
 
-
     for i in range(len(pokemon)):
         allpikomons.append({
-            "name": str(pokemon.loc[i,'name']),
-            "id": str(pokemon.loc[i,'id']),
-            "typing": str(pokemon.loc[i,'typing']),
-            "pokedex_number": str(pokemon.loc[i,'pokedex_number']),
-            "img": str(pokemon.loc[i,'id'])
+            "name": str(pokemon.loc[i, 'name']),
+            "id": str(pokemon.loc[i, 'id']),
+            "typing": str(pokemon.loc[i, 'typing']),
+            "pokedex_number": str(pokemon.loc[i, 'pokedex_number']),
+            "img": str(pokemon.loc[i, 'id'])
         })
 
     return make_response(
         jsonify(allpikomons)
     )
+
+
+@app.route('/pokemonscluster/<string:id>', methods=['GET'])
+def cluster_by_pokemon(id):
+    local_ds = dsP.copy()
+    
+    pokemon_input_cluster_loc = local_ds.loc[local_ds['id'] == id,'cluster_id']
+    print(pokemon_input_cluster_loc)
+
+    pokemons_by_cluster_id = local_ds.loc[local_ds['cluster_id']
+                                     == pokemon_input_cluster_loc]
+
+    print(pokemons_by_cluster_id)
+    
+    all_pikomons = []
+
+    for i in pokemons_by_cluster_id.index:
+        all_pikomons.append({
+            "name": str(pokemons_by_cluster_id.loc[i, 'name']),
+            "id": str(pokemons_by_cluster_id.loc[i, 'id']),
+            "typing": str(pokemons_by_cluster_id.loc[i, 'typing']),
+            "pokedex_number": str(pokemons_by_cluster_id.loc[i, 'pokedex_number']),
+            "img": str(pokemons_by_cluster_id.loc[i, 'id'])
+        })
+
+    return make_response(
+        jsonify(all_pikomons)
+    )
+
 
 app.run()
