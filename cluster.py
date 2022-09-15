@@ -85,6 +85,29 @@ def one_hot_encode_column(dataframe, col):
 
     dataframe.drop([col], axis=1, inplace=True)
 
+
+# def one_hot_encode_column(dataFrame, col):
+
+#    unique_val = dataFrame[col].unique()
+#    ds_aux = pd.DataFrame(columns=unique_val)   
+#    var_iterator = [itemlist for itemlist in unique_val]
+#    for index in range(len(dataFrame)):
+#        dataAux = list()
+#        current_val = dataFrame.loc[index, col]
+#        for index_i in var_iterator:
+#          if current_val == index_i:
+#            dataAux.append(1)
+#          else:
+#            dataAux.append(0)
+#        ds_aux.loc[index] = dataAux
+   
+#    new_dataFrame = pd.concat([dataFrame, ds_aux], axis= 1)
+#    new_dataFrame.drop([col], axis=1, inplace=True)
+#    return new_dataFrame
+
+
+
+
 def one_hot_encode_all(dataframe):
     all_but_type = colunas_categorias_nominais.copy()
     all_but_type.remove('typing')
