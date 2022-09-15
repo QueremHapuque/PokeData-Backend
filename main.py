@@ -3,16 +3,25 @@ from flask import Flask, make_response, jsonify
 import json
 import pandas as pd
 import cluster
+import warnings
 from pokeColuna import pokeId
 from vulnerabilities import list_Vulnerabilities
 
+warnings.filterwarnings("ignore")
 app = Flask(__name__)
 app.config['JSON_SORT_KEYS'] = False
 
+print('LOG -- Importando Dataset')
 dsP = pd.read_parquet('pokemon.parquet')
-dsP = pokeId(dsP)
+print('LOG -- Dataset importado')
 
-cluster_column = cluster.create_cluster(dsP, 12)
+print('LOG -- Habitando coluna de IDS')
+dsP = pokeId(dsP)
+print('LOG -- Coluna de IDS Habitada')
+
+print('LOG -- Criando cluster')
+cluster_column = cluster.create_cluster(dsP, 45)
+print('LOG -- Cluster criado')
 
 dsP['cluster_id'] = cluster_column
 
@@ -149,11 +158,12 @@ def allpokemons():
 def cluster_by_pokemon(id):
     local_ds = dsP.copy()
     
-    pokemon_input_cluster_loc = local_ds.loc[local_ds['id'] == id,'cluster_id']
-    print(pokemon_input_cluster_loc)
+    pokemon_input_id = local_ds.index[local_ds['id'] == id].tolist()[0]
+    pokemon_input_cluster_index = local_ds.loc[pokemon_input_id,'cluster_id']
+    print(pokemon_input_cluster_index)
 
     pokemons_by_cluster_id = local_ds.loc[local_ds['cluster_id']
-                                     == pokemon_input_cluster_loc]
+                                     == pokemon_input_cluster_index]
 
     print(pokemons_by_cluster_id)
     
