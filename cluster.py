@@ -102,8 +102,6 @@ def create_cluster(dataframe, k):
     type_one_hot_encode(dataframe_done)
     one_hot_encode_all(dataframe_done)
     bool_to_int(dataframe_done)
-    print('cheguei aqui')
-    print(dataframe_done.describe)
     cluster = KMeans(n_clusters=k)
     cluster.fit(dataframe_done)
     
