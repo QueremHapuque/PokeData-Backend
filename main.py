@@ -57,30 +57,6 @@ def aldataofpokemon(index):
         jsonify(pokemon_data)
     )
 
-@app.route('/allweaknessofpokemon/<string:id>', methods=['GET'])
-def allweaknessofpokemon(id):
-    pokemon = dsP.loc[dsP['id'] == str(id)].to_dict()
-    vulnerabilities = list_Vulnerabilities(pokemon)
-    bigger = 0
-    type1 = ''
-    type2 = ''
-
-    for key, value in vulnerabilities.items():
-        if value > bigger:
-            type2 = type1
-            type1 = key
-
-    weakness = [
-        {
-            "type_1": type1,
-            "type_2": type2,
-        }
-    ]
-
-    return make_response(
-        jsonify(vulnerabilities)
-    )
-
 @app.route('/alladvantageofpokemon/<string:tipo>', methods=['GET'])
 def alladvantageofpokemon(tipo):
 
