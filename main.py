@@ -99,7 +99,7 @@ def allweaknessofpokemon(id):
     ]
 
     return make_response(
-        jsonify(vulnerabilities)
+        jsonify(weakness)
     )
 
 
