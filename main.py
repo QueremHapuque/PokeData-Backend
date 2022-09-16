@@ -81,14 +81,14 @@ def alladvantageofpokemon(tipo):
         if tipo1 != dsjson['typing'][listaIndex[contador]]:
             tipo2 = dsjson['typing'][listaIndex[contador]]
             break
-    vantagens = [
+    advantages = [
         {
             "type_1": tipo1,
             "type_2": tipo2
         }
     ]
     return make_response(
-        jsonify(vantagens)
+        jsonify(advantages)
     )
 
 @app.route('/allweaknessofpokemon/<string:id>', methods=['GET'])
@@ -168,10 +168,10 @@ def cluster_by_pokemon(id):
 
     print(pokemons_by_cluster_id)
     
-    all_pikomons = []
+    all_pokemons = []
 
     for i in pokemons_by_cluster_id.index:
-        all_pikomons.append({
+        all_pokemons.append({
             "name": str(pokemons_by_cluster_id.loc[i, 'name']),
             "id": str(pokemons_by_cluster_id.loc[i, 'id']),
             "typing": str(pokemons_by_cluster_id.loc[i, 'typing']),
@@ -180,7 +180,7 @@ def cluster_by_pokemon(id):
         })
 
     return make_response(
-        jsonify(all_pikomons)
+        jsonify(all_pokemons)
     )
 
 
