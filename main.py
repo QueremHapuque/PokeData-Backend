@@ -29,27 +29,27 @@ ds = open('pokemon.json')
 dsjson = json.load(ds)
 
 
-@app.route('/pokeinfo/<string:index>', methods=['GET'])
-def aldataofpokemon(index):
+@app.route('/alldataofpokemon/<string:id>', methods=['GET'])
+def alldataofpokemon(id):
     
-    pokemon = dsP.loc[dsP['pokedex_number'] == int(index)].to_dict()
-    
+    pokemon = dsP.loc[dsP['id'] == str(id)].to_dict()
+
     pokemon_data = [
         {
-            "name": str(pokemon['name'].values()),
-            "typing":str(pokemon['typing'].values()),
-            "primary_color": str(pokemon['primary_color'].values()),
-            "height": str(pokemon['height'].values()),
-            "weight": str(pokemon['weight'].values()),
-            "gen_introduced": str(pokemon['gen_introduced'].values()),
-            "hp": str(pokemon['hp'].values()),
-            "attack":str(pokemon['attack'].values()),
-            "defense": str(pokemon['defense'].values()),
-            "speed": str(pokemon['speed'].values()),
-            "special_attack": str(pokemon['special_attack'].values()),
-            "special_defense": str(pokemon['special_defense'].values()),
-            "abilities": str(pokemon['abilities'].values()),
-            "id": str(pokemon['id'].values())
+            "name": str(*pokemon['name'].values()),
+            "typing":str(*pokemon['typing'].values()),
+            "primary_color": str(*pokemon['primary_color'].values()),
+            "height": str(*pokemon['height'].values()),
+            "weight": str(*pokemon['weight'].values()),
+            "gen_introduced": str(*pokemon['gen_introduced'].values()),
+            "hp": str(*pokemon['hp'].values()),
+            "attack":str(*pokemon['attack'].values()),
+            "defense": str(*pokemon['defense'].values()),
+            "speed": str(*pokemon['speed'].values()),
+            "special_attack": str(*pokemon['special_attack'].values()),
+            "special_defense": str(*pokemon['special_defense'].values()),
+            "abilities": str(*pokemon['abilities'].values()),
+            "id": str(*pokemon['id'].values())
         }
     ]
 
@@ -122,12 +122,12 @@ def allstatusofpokemon(id):
 
     pokemon_status = [
         {
-            "hp": str(pokemon['hp'].values()),
-            "attack": str(pokemon['attack'].values()),
-            "defense": str(pokemon['defense'].values()),
-            "speed": str(pokemon['speed'].values()),
-            "special_attack": str(pokemon['special_attack'].values()),
-            "special_defense": str(pokemon['special_defense'].values())
+            "hp": str(*pokemon['hp'].values()),
+            "attack": str(*pokemon['attack'].values()),
+            "defense": str(*pokemon['defense'].values()),
+            "speed": str(*pokemon['speed'].values()),
+            "special_attack": str(*pokemon['special_attack'].values()),
+            "special_defense": str(*pokemon['special_defense'].values())
         }
     ]
 
