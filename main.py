@@ -28,15 +28,35 @@ dsP['cluster_id'] = cluster_column
 ds = open('pokemon.json')
 dsjson = json.load(ds)
 
+vulnerabilities = ['normal_attack_effectiveness',
+        'fire_attack_effectiveness',
+        'water_attack_effectiveness',
+        'electric_attack_effectiveness',
+        'grass_attack_effectiveness',
+        'ice_attack_effectiveness',
+        'fighting_attack_effectiveness',
+        'poison_attack_effectiveness',
+        'ground_attack_effectiveness',
+        'fly_attack_effectiveness',
+        'psychic_attack_effectiveness',
+        'bug_attack_effectiveness',
+        'rock_attack_effectiveness',
+        'ghost_attack_effectiveness',
+        'dragon_attack_effectiveness',
+        'dark_attack_effectiveness',
+        'steel_attack_effectiveness',
+        'fairy_attack_effectiveness']
+
 
 @app.route('/alldataofpokemon/<string:id>', methods=['GET'])
 def alldataofpokemon(id):
-    
+
     pokemon = dsP.loc[dsP['id'] == str(id)].to_dict()
 
     pokemon_data = [
         {
             "name": str(*pokemon['name'].values()),
+            "genus": str(*pokemon['genus'].values()),
             "typing":str(*pokemon['typing'].values()),
             "primary_color": str(*pokemon['primary_color'].values()),
             "height": str(*pokemon['height'].values()),
@@ -57,62 +77,72 @@ def alldataofpokemon(id):
         jsonify(pokemon_data)
     )
 
-@app.route('/alladvantageofpokemon/<string:tipo>', methods=['GET'])
-def alladvantageofpokemon(tipo):
 
-    listaMultplicador = []
-    listaIndex = []
-    contador = 0
-    ataq = 'fire_attack_effectiveness'
-    maior = 0
-    tipo1 = ''
-    tipo2 = ''
-    rep = ataq.replace('fire', tipo)
-    for mult in dsjson[rep]:
-        if int(dsjson[rep][mult]) >= maior:
-            maior = int(dsjson[rep][mult])
-            listaMultplicador.append(maior)
-            listaIndex.append(mult)
+@app.route('/alladvantageofpokemon/<string:id>', methods=['GET'])
+def alladvantageofpokemon(id):
 
-    for i in range(len(listaIndex)):
-        contador -= 1
-        if tipo1 == '':
-            tipo1 = dsjson['typing'][listaIndex[contador]]
-        if tipo1 != dsjson['typing'][listaIndex[contador]]:
-            tipo2 = dsjson['typing'][listaIndex[contador]]
-            break
-    advantages = [
-        {
-            "type_1": tipo1,
-            "type_2": tipo2
-        }
-    ]
+    local_ds = dsP.copy()
+    vuls = vulnerabilities.copy()
+    pokemon_input_index = local_ds.index[local_ds['id'] == id].tolist()[0]
+    
+    max_controller = 0
+    max_vuls = [0,0]
+    for vul in vuls:
+        iter_vul = int(local_ds.loc[pokemon_input_index, vul])
+        if iter_vul > max_controller:
+            max_controller = iter_vul
+            max_vuls[0] = vul
+            
+    vuls.remove(max_vuls[0])
+    max_controller = 0
+    
+    for vul in vuls:
+        iter_vul = int(local_ds.loc[pokemon_input_index, vul])
+        if iter_vul > max_controller:
+            max_controller = iter_vul
+            max_vuls[1] = vul
+    
+    json_body_list = [{
+        'type1' : max_vuls[0].split('_')[0].capitalize(),
+        'type2' : max_vuls[1].split('_')[0].capitalize()
+    }]
+    
     return make_response(
-        jsonify(advantages)
+        jsonify(json_body_list)
     )
+    
 
 @app.route('/allweaknessofpokemon/<string:id>', methods=['GET'])
 def allweaknessofpokemon(id):
-    pokemon = dsP.loc[dsP['id'] == str(id)].to_dict()
-    vulnerabilities = list_Vulnerabilities(pokemon)
-    bigger = 0
-    type1 = ''
-    type2 = ''
-
-    for key, value in vulnerabilities.items():
-        if value > bigger:
-            type2 = type1
-            type1 = key
-
-    weakness = [
-        {
-            "type_1": type1,
-            "type_2": type2,
-        }
-    ]
-
+   
+    local_ds = dsP.copy()
+    vuls = vulnerabilities.copy()
+    pokemon_input_index = local_ds.index[local_ds['id'] == id].tolist()[0]
+    
+    max_controller = 20
+    max_vuls = [0,0]
+    for vul in vuls:
+        iter_vul = int(local_ds.loc[pokemon_input_index, vul])
+        if iter_vul <  max_controller:
+            max_controller = iter_vul
+            max_vuls[0] = vul
+            
+    vuls.remove(max_vuls[0])
+    max_controller = 20
+    
+    for vul in vuls:
+        iter_vul = int(local_ds.loc[pokemon_input_index, vul])
+        if iter_vul < max_controller:
+            max_controller = iter_vul
+            max_vuls[1] = vul
+    
+    json_body_list = [{
+        'type1' : max_vuls[0].split('_')[0].capitalize(),
+        'type2' : max_vuls[1].split('_')[0].capitalize()
+    }]
+    
     return make_response(
-        jsonify(weakness)
+        jsonify(json_body_list)
     )
 
 
@@ -134,6 +164,7 @@ def allstatusofpokemon(id):
     return make_response(
         jsonify(pokemon_status)
     )
+
 
 @app.route('/allpokemons', methods=['GET'])
 def allpokemons():
@@ -158,16 +189,13 @@ def allpokemons():
 @app.route('/pokemonscluster/<string:id>', methods=['GET'])
 def cluster_by_pokemon(id):
     local_ds = dsP.copy()
-    
+
     pokemon_input_id = local_ds.index[local_ds['id'] == id].tolist()[0]
-    pokemon_input_cluster_index = local_ds.loc[pokemon_input_id,'cluster_id']
-    print(pokemon_input_cluster_index)
+    pokemon_input_cluster_index = local_ds.loc[pokemon_input_id, 'cluster_id']
 
     pokemons_by_cluster_id = local_ds.loc[local_ds['cluster_id']
-                                     == pokemon_input_cluster_index]
+                                          == pokemon_input_cluster_index]
 
-    print(pokemons_by_cluster_id)
-    
     all_pokemons = []
 
     for i in pokemons_by_cluster_id.index:
