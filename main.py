@@ -20,7 +20,7 @@ dsP = pokeId(dsP)
 print('LOG -- Coluna de IDS Habitada')
 
 print('LOG -- Criando cluster')
-cluster_column = cluster.create_cluster(dsP, 45)
+cluster_column = cluster.create_cluster(dsP, 12)
 print('LOG -- Cluster criado')
 
 dsP['cluster_id'] = cluster_column

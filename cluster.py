@@ -144,8 +144,6 @@ def one_hot_encode_column(dataframe, col):
 #    return new_dataFrame
 
 
-
-
 def one_hot_encode_all(dataframe):
     all_but_type = colunas_categorias_nominais.copy()
     all_but_type.remove('abilities')
