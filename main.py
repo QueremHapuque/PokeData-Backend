@@ -20,7 +20,7 @@ dsP = pokeId(dsP)
 print('LOG -- Coluna de IDS Habitada')
 
 print('LOG -- Criando cluster')
-cluster_column = cluster.create_cluster(dsP, 12)
+cluster_column = cluster.create_cluster(dsP, 40)
 print('LOG -- Cluster criado')
 
 dsP['cluster_id'] = cluster_column
@@ -29,49 +29,116 @@ ds = open('pokemon.json')
 dsjson = json.load(ds)
 
 vulnerabilities = ['normal_attack_effectiveness',
-        'fire_attack_effectiveness',
-        'water_attack_effectiveness',
-        'electric_attack_effectiveness',
-        'grass_attack_effectiveness',
-        'ice_attack_effectiveness',
-        'fighting_attack_effectiveness',
-        'poison_attack_effectiveness',
-        'ground_attack_effectiveness',
-        'fly_attack_effectiveness',
-        'psychic_attack_effectiveness',
-        'bug_attack_effectiveness',
-        'rock_attack_effectiveness',
-        'ghost_attack_effectiveness',
-        'dragon_attack_effectiveness',
-        'dark_attack_effectiveness',
-        'steel_attack_effectiveness',
-        'fairy_attack_effectiveness']
+                   'fire_attack_effectiveness',
+                   'water_attack_effectiveness',
+                   'electric_attack_effectiveness',
+                   'grass_attack_effectiveness',
+                   'ice_attack_effectiveness',
+                   'fighting_attack_effectiveness',
+                   'poison_attack_effectiveness',
+                   'ground_attack_effectiveness',
+                   'fly_attack_effectiveness',
+                   'psychic_attack_effectiveness',
+                   'bug_attack_effectiveness',
+                   'rock_attack_effectiveness',
+                   'ghost_attack_effectiveness',
+                   'dragon_attack_effectiveness',
+                   'dark_attack_effectiveness',
+                   'steel_attack_effectiveness',
+                   'fairy_attack_effectiveness']
+
+
+def weaknesses(pokemon_index, local_ds):
+    vuls = vulnerabilities.copy()
+    max_controller = 20
+    max_vuls = [0, 0]
+    for vul in vuls:
+        iter_vul = int(local_ds.loc[pokemon_index, vul])
+        if iter_vul < max_controller:
+            max_controller = iter_vul
+            max_vuls[0] = vul
+
+    vuls.remove(max_vuls[0])
+    max_controller = 20
+
+    for vul in vuls:
+        iter_vul = int(local_ds.loc[pokemon_index, vul])
+        if iter_vul < max_controller:
+            max_controller = iter_vul
+            max_vuls[1] = vul
+
+    return {
+        'type1': max_vuls[0].split('_')[0].capitalize(),
+        'type2': max_vuls[1].split('_')[0].capitalize()
+    }
+
+
+def advantages(pokemon_index, local_ds):
+    vuls = vulnerabilities.copy()
+    max_controller = 0
+    max_vuls = [0, 0]
+    for vul in vuls:
+        iter_vul = int(local_ds.loc[pokemon_index, vul])
+        if iter_vul > max_controller:
+            max_controller = iter_vul
+            max_vuls[0] = vul
+
+    vuls.remove(max_vuls[0])
+    max_controller = 0
+
+    for vul in vuls:
+        iter_vul = int(local_ds.loc[pokemon_index, vul])
+        if iter_vul > max_controller:
+            max_controller = iter_vul
+            max_vuls[1] = vul
+
+    return {
+        'type1': max_vuls[0].split('_')[0].capitalize(),
+        'type2': max_vuls[1].split('_')[0].capitalize()
+    }
+
+
+def types_to_map(types_string):
+    types_list = types_string.split('~')
+    types_dict = {}
+    for i in range(len(types_list)):
+        types_dict["type"+str(i+1)] = types_list[i]
+    return types_dict
+
+
+def abilities_to_map(abilities_string):
+    abilities_list = abilities_string.split('~')
+    abilities_dict = {}
+    for i in range(len(abilities_list)):
+        abilities_dict["ability"+str(i+1)] = abilities_list[i]
+    return abilities_dict
 
 
 @app.route('/alldataofpokemon/<string:id>', methods=['GET'])
 def alldataofpokemon(id):
 
-    pokemon = dsP.loc[dsP['id'] == str(id)].to_dict()
+    local_ds = dsP.copy()
+    pokemon = local_ds.loc[dsP['id'] == str(id)].to_dict()
+    pokemon_input_index = local_ds.index[local_ds['id'] == id].tolist()[0]
 
-    pokemon_data = [
-        {
-            "name": str(*pokemon['name'].values()),
-            "genus": str(*pokemon['genus'].values()),
-            "typing":str(*pokemon['typing'].values()),
-            "primary_color": str(*pokemon['primary_color'].values()),
-            "height": str(*pokemon['height'].values()),
-            "weight": str(*pokemon['weight'].values()),
-            "gen_introduced": str(*pokemon['gen_introduced'].values()),
-            "hp": str(*pokemon['hp'].values()),
-            "attack":str(*pokemon['attack'].values()),
-            "defense": str(*pokemon['defense'].values()),
-            "speed": str(*pokemon['speed'].values()),
-            "special_attack": str(*pokemon['special_attack'].values()),
-            "special_defense": str(*pokemon['special_defense'].values()),
-            "abilities": str(*pokemon['abilities'].values()),
-            "id": str(*pokemon['id'].values())
-        }
-    ]
+    pokemon_data = {
+        "name": str(*pokemon['name'].values()),
+        "genus": str(*pokemon['genus'].values()),
+        "typing": str(types_to_map(*pokemon['typing'].values())),
+        "primary_color": str(*pokemon['primary_color'].values()),
+        "height": str(*pokemon['height'].values()),
+        "weight": str(*pokemon['weight'].values()),
+        "hp": str(*pokemon['hp'].values()),
+        "attack": str(*pokemon['attack'].values()),
+        "defense": str(*pokemon['defense'].values()),
+        "speed": str(*pokemon['speed'].values()),
+        "special_attack": str(*pokemon['special_attack'].values()),
+        "special_defense": str(*pokemon['special_defense'].values()),
+        "abilities": str(abilities_to_map(*pokemon['abilities'].values())),
+        "id": str(*pokemon['id'].values()),
+        "weaknesses": str(weaknesses(pokemon_input_index, local_ds)),
+        "advantages": str(advantages(pokemon_input_index, local_ds)),
+        "pokedex_number": str(*pokemon['pokedex_number'])}
 
     return make_response(
         jsonify(pokemon_data)
@@ -84,63 +151,63 @@ def alladvantageofpokemon(id):
     local_ds = dsP.copy()
     vuls = vulnerabilities.copy()
     pokemon_input_index = local_ds.index[local_ds['id'] == id].tolist()[0]
-    
+
     max_controller = 0
-    max_vuls = [0,0]
+    max_vuls = [0, 0]
     for vul in vuls:
         iter_vul = int(local_ds.loc[pokemon_input_index, vul])
         if iter_vul > max_controller:
             max_controller = iter_vul
             max_vuls[0] = vul
-            
+
     vuls.remove(max_vuls[0])
     max_controller = 0
-    
+
     for vul in vuls:
         iter_vul = int(local_ds.loc[pokemon_input_index, vul])
         if iter_vul > max_controller:
             max_controller = iter_vul
             max_vuls[1] = vul
-    
+
     json_body_list = [{
-        'type1' : max_vuls[0].split('_')[0].capitalize(),
-        'type2' : max_vuls[1].split('_')[0].capitalize()
+        'type1': max_vuls[0].split('_')[0].capitalize(),
+        'type2': max_vuls[1].split('_')[0].capitalize()
     }]
-    
+
     return make_response(
         jsonify(json_body_list)
     )
-    
+
 
 @app.route('/allweaknessofpokemon/<string:id>', methods=['GET'])
 def allweaknessofpokemon(id):
-   
+
     local_ds = dsP.copy()
     vuls = vulnerabilities.copy()
     pokemon_input_index = local_ds.index[local_ds['id'] == id].tolist()[0]
-    
+
     max_controller = 20
-    max_vuls = [0,0]
+    max_vuls = [0, 0]
     for vul in vuls:
         iter_vul = int(local_ds.loc[pokemon_input_index, vul])
-        if iter_vul <  max_controller:
+        if iter_vul < max_controller:
             max_controller = iter_vul
             max_vuls[0] = vul
-            
+
     vuls.remove(max_vuls[0])
     max_controller = 20
-    
+
     for vul in vuls:
         iter_vul = int(local_ds.loc[pokemon_input_index, vul])
         if iter_vul < max_controller:
             max_controller = iter_vul
             max_vuls[1] = vul
-    
+
     json_body_list = [{
-        'type1' : max_vuls[0].split('_')[0].capitalize(),
-        'type2' : max_vuls[1].split('_')[0].capitalize()
+        'type1': max_vuls[0].split('_')[0].capitalize(),
+        'type2': max_vuls[1].split('_')[0].capitalize()
     }]
-    
+
     return make_response(
         jsonify(json_body_list)
     )
