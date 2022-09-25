@@ -48,7 +48,7 @@ vulnerabilities = ['normal_attack_effectiveness',
                    'fairy_attack_effectiveness']
 
 
-def weaknesses(pokemon_index, local_ds):
+def advantages(pokemon_index, local_ds):
     vuls = vulnerabilities.copy()
     max_controller = 20
     max_vuls = [0, 0]
@@ -73,7 +73,7 @@ def weaknesses(pokemon_index, local_ds):
     }
 
 
-def advantages(pokemon_index, local_ds):
+def weaknesses(pokemon_index, local_ds):
     vuls = vulnerabilities.copy()
     max_controller = 0
     max_vuls = [0, 0]
@@ -124,7 +124,7 @@ def alldataofpokemon(id):
     pokemon_data = {
         "name": str(*pokemon['name'].values()),
         "genus": str(*pokemon['genus'].values()),
-        "typing": str(types_to_map(*pokemon['typing'].values())),
+        "typing": types_to_map(*pokemon['typing'].values()),
         "primary_color": str(*pokemon['primary_color'].values()),
         "height": str(*pokemon['height'].values()),
         "weight": str(*pokemon['weight'].values()),
@@ -134,11 +134,11 @@ def alldataofpokemon(id):
         "speed": str(*pokemon['speed'].values()),
         "special_attack": str(*pokemon['special_attack'].values()),
         "special_defense": str(*pokemon['special_defense'].values()),
-        "abilities": str(abilities_to_map(*pokemon['abilities'].values())),
+        "abilities": abilities_to_map(*pokemon['abilities'].values()),
         "id": str(*pokemon['id'].values()),
-        "weaknesses": str(weaknesses(pokemon_input_index, local_ds)),
-        "advantages": str(advantages(pokemon_input_index, local_ds)),
-        "pokedex_number": str(*pokemon['pokedex_number'])}
+        "weaknesses": weaknesses(pokemon_input_index, local_ds),
+        "advantages": advantages(pokemon_input_index, local_ds),
+        "pokedex_number": str(*pokemon['pokedex_number'].values())}
 
     return make_response(
         jsonify(pokemon_data)
@@ -152,20 +152,20 @@ def alladvantageofpokemon(id):
     vuls = vulnerabilities.copy()
     pokemon_input_index = local_ds.index[local_ds['id'] == id].tolist()[0]
 
-    max_controller = 0
+    max_controller = 20
     max_vuls = [0, 0]
     for vul in vuls:
         iter_vul = int(local_ds.loc[pokemon_input_index, vul])
-        if iter_vul > max_controller:
+        if iter_vul < max_controller:
             max_controller = iter_vul
             max_vuls[0] = vul
 
     vuls.remove(max_vuls[0])
-    max_controller = 0
+    max_controller = 20
 
     for vul in vuls:
         iter_vul = int(local_ds.loc[pokemon_input_index, vul])
-        if iter_vul > max_controller:
+        if iter_vul < max_controller:
             max_controller = iter_vul
             max_vuls[1] = vul
 
@@ -178,28 +178,28 @@ def alladvantageofpokemon(id):
         jsonify(json_body_list)
     )
 
+   
 
 @app.route('/allweaknessofpokemon/<string:id>', methods=['GET'])
 def allweaknessofpokemon(id):
-
     local_ds = dsP.copy()
     vuls = vulnerabilities.copy()
     pokemon_input_index = local_ds.index[local_ds['id'] == id].tolist()[0]
 
-    max_controller = 20
+    max_controller = 0
     max_vuls = [0, 0]
     for vul in vuls:
         iter_vul = int(local_ds.loc[pokemon_input_index, vul])
-        if iter_vul < max_controller:
+        if iter_vul > max_controller:
             max_controller = iter_vul
             max_vuls[0] = vul
 
     vuls.remove(max_vuls[0])
-    max_controller = 20
+    max_controller = 0
 
     for vul in vuls:
         iter_vul = int(local_ds.loc[pokemon_input_index, vul])
-        if iter_vul < max_controller:
+        if iter_vul > max_controller:
             max_controller = iter_vul
             max_vuls[1] = vul
 
@@ -211,6 +211,7 @@ def allweaknessofpokemon(id):
     return make_response(
         jsonify(json_body_list)
     )
+
 
 
 @app.route('/allstatusofpokemon/<string:id>', methods=['GET'])
@@ -266,13 +267,14 @@ def cluster_by_pokemon(id):
     all_pokemons = []
 
     for i in pokemons_by_cluster_id.index:
-        all_pokemons.append({
-            "name": str(pokemons_by_cluster_id.loc[i, 'name']),
-            "id": str(pokemons_by_cluster_id.loc[i, 'id']),
-            "typing": str(pokemons_by_cluster_id.loc[i, 'typing']),
-            "pokedex_number": str(pokemons_by_cluster_id.loc[i, 'pokedex_number']),
-            "img": str(pokemons_by_cluster_id.loc[i, 'id'])
-        })
+        if str(pokemons_by_cluster_id.loc[i, 'id']) != id:
+            all_pokemons.append({
+                "name": str(pokemons_by_cluster_id.loc[i, 'name']),
+                "id": str(pokemons_by_cluster_id.loc[i, 'id']),
+                "typing": str(pokemons_by_cluster_id.loc[i, 'typing']),
+                "pokedex_number": str(pokemons_by_cluster_id.loc[i, 'pokedex_number']),
+                "img": str(pokemons_by_cluster_id.loc[i, 'id'])
+            })
 
     return make_response(
         jsonify(all_pokemons)
